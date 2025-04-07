@@ -12,7 +12,6 @@ from llama_index import (
 )
 from llama_index.vector_stores.types import VectorStore
 from tempfile import TemporaryDirectory
-import requests
 import nest_asyncio
 from datetime import timedelta
 from cachetools import cached, TTLCache
@@ -54,6 +53,7 @@ from app.chat.tools import get_api_query_engine_tool
 from app.chat.utils import build_title_for_document
 from app.chat.pg_vector import get_vector_store_singleton
 from app.chat.qa_response_synth import get_custom_response_synth
+from security import safe_requests
 
 
 logger = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ def fetch_and_read_document(
     with TemporaryDirectory() as temp_dir:
         temp_file_path = Path(temp_dir) / f"{str(document.id)}.pdf"
         with open(temp_file_path, "wb") as temp_file:
-            with requests.get(document.url, stream=True) as r:
+            with safe_requests.get(document.url, stream=True) as r:
                 r.raise_for_status()
                 for chunk in r.iter_content(chunk_size=8192):
                     temp_file.write(chunk)

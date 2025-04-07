@@ -4,11 +4,12 @@ from sseclient import SSEClient
 import json
 import random
 from urllib.parse import quote
+from security import safe_requests
 
 
 def sse_with_requests(url, headers) -> requests.Response:
     """Get a streaming response for the given event feed using requests."""
-    return requests.get(url, stream=True, headers=headers)
+    return safe_requests.get(url, stream=True, headers=headers)
 
 
 class DocumentPickerCmd(cmd.Cmd):
@@ -22,7 +23,7 @@ class DocumentPickerCmd(cmd.Cmd):
 
     def do_fetch(self, args):
         "Get 5 documents: fetch"
-        response = requests.get(f"{self.base_url}/api/document/")
+        response = safe_requests.get(f"{self.base_url}/api/document/")
         if response.status_code == 200:
             self.documents = random.choices(response.json(), k=5)
             for idx, doc in enumerate(self.documents):
@@ -102,7 +103,7 @@ class ConversationCmd(cmd.Cmd):
         if not self.conversation_id:
             print("No active conversation. Use CREATE to start a new conversation.")
             return
-        response = requests.get(
+        response = safe_requests.get(
             f"{self.base_url}/api/conversation/{self.conversation_id}"
         )
         if response.status_code == 200:
