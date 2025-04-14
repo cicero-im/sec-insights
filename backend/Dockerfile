@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/python
-FROM python:3.11.3-slim-bullseye
+FROM python:3.13.3-slim-bullseye
 
 ENV PYTHONUNBUFFERED True
 ENV APP_HOME /app
