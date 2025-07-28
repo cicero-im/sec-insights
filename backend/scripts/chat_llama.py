@@ -8,7 +8,7 @@ from urllib.parse import quote
 
 def sse_with_requests(url, headers) -> requests.Response:
     """Get a streaming response for the given event feed using requests."""
-    return requests.get(url, stream=True, headers=headers)
+    return requests.get(url, stream=True, headers=headers, timeout=60)
 
 
 class DocumentPickerCmd(cmd.Cmd):
@@ -22,7 +22,7 @@ class DocumentPickerCmd(cmd.Cmd):
 
     def do_fetch(self, args):
         "Get 5 documents: fetch"
-        response = requests.get(f"{self.base_url}/api/document/")
+        response = requests.get(f"{self.base_url}/api/document/", timeout=60)
         if response.status_code == 200:
             self.documents = random.choices(response.json(), k=5)
             for idx, doc in enumerate(self.documents):
@@ -90,7 +90,7 @@ class ConversationCmd(cmd.Cmd):
     def do_create(self, args):
         "Create a new conversation: CREATE"
         req_body = {"document_ids": self.document_ids}
-        response = requests.post(f"{self.base_url}/api/conversation/", json=req_body)
+        response = requests.post(f"{self.base_url}/api/conversation/", json=req_body, timeout=60)
         if response.status_code == 200:
             self.conversation_id = response.json()["id"]
             print(f"Created conversation with ID {self.conversation_id}")
@@ -103,8 +103,8 @@ class ConversationCmd(cmd.Cmd):
             print("No active conversation. Use CREATE to start a new conversation.")
             return
         response = requests.get(
-            f"{self.base_url}/api/conversation/{self.conversation_id}"
-        )
+            f"{self.base_url}/api/conversation/{self.conversation_id}", 
+        timeout=60)
         if response.status_code == 200:
             print(json.dumps(response.json(), indent=4))
         else:
@@ -116,8 +116,8 @@ class ConversationCmd(cmd.Cmd):
             print("No active conversation to delete.")
             return
         response = requests.delete(
-            f"{self.base_url}/api/conversation/{self.conversation_id}"
-        )
+            f"{self.base_url}/api/conversation/{self.conversation_id}", 
+        timeout=60)
         if response.status_code == 204:
             print(f"Deleted conversation with ID {self.conversation_id}")
             self.conversation_id = None
