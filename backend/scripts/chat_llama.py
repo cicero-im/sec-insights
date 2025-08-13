@@ -2,8 +2,8 @@ import cmd
 import requests
 from sseclient import SSEClient
 import json
-import random
 from urllib.parse import quote
+import secrets
 
 
 def sse_with_requests(url, headers) -> requests.Response:
@@ -24,7 +24,7 @@ class DocumentPickerCmd(cmd.Cmd):
         "Get 5 documents: fetch"
         response = requests.get(f"{self.base_url}/api/document/")
         if response.status_code == 200:
-            self.documents = random.choices(response.json(), k=5)
+            self.documents = secrets.SystemRandom().choices(response.json(), k=5)
             for idx, doc in enumerate(self.documents):
                 print(f"[{idx}]: {doc['url']}")
         else:
